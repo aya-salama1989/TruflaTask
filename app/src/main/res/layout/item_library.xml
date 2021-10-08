@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_library_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        tools:text="Library Title"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+
+    <TextView
+        android:id="@+id/tv_license_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        tools:text="Library License"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/tv_watchers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        tools:text="Library watchers"
+        android:text="@string/no_of_watchers"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
+
+</LinearLayout>
