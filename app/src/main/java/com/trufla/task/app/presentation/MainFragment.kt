@@ -48,38 +48,46 @@ class MainFragment : DaggerFragment() {
     private fun getData() {
         viewModel.getLibrariesList()
         viewModel.libraries.observe(viewLifecycleOwner, {
+            binding.tvError.visibility = View.GONE
+            binding.pbLibraries.visibility = View.GONE
             setLayout(it)
+        })
+
+        viewModel.errorData.observe(viewLifecycleOwner, {
+            binding.pbLibraries.visibility = View.GONE
+            binding.tvError.visibility = View.VISIBLE
+            binding.tvError.text = it
         })
     }
 
     private fun setLayout(libraries: List<LibraryEntity>) {
-        if (!libraries.isNullOrEmpty())
+        if (!libraries.isNullOrEmpty()) {
             libs.addAll(libraries)
 
-        binding.rvLibraries.visibility = View.VISIBLE
-        val adapter = LibrariesAdapter()
-        binding.rvLibraries.adapter = adapter
+            binding.rvLibraries.visibility = View.VISIBLE
+            val adapter = LibrariesAdapter()
+            binding.rvLibraries.adapter = adapter
 
-        //submit the whole list to adapter again?!
-        adapter.submitList(libs)
+            //submit the whole list to adapter again?!
+            adapter.submitList(libs)
 
-        binding.rvLibraries.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = binding.rvLibraries.layoutManager as LinearLayoutManager
-                if (layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 3) {
-                    //Post delayed is used tp avoid 403 API response out
-                    // of fast scrolling after the 4th page
-                    Handler().postDelayed({
-                        viewModel.getLibrariesList()
-                    }, 4000)
+            binding.rvLibraries.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    val layoutManager = binding.rvLibraries.layoutManager as LinearLayoutManager
+                    if (layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 3) {
+                        //Post delayed is used tp avoid 403 API response out
+                        // of fast scrolling after the 4th page
+                        Handler().postDelayed({
+                            viewModel.getLibrariesList()
+                        }, 4000)
 
+                    }
+
+                    super.onScrolled(recyclerView, dx, dy)
                 }
+            })
+        }
 
-                super.onScrolled(recyclerView, dx, dy)
-            }
-        })
-
-        binding.pbLibraries.visibility = View.GONE
     }
 
     override fun onDestroyView() {
