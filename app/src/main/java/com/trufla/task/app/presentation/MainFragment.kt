@@ -60,6 +60,22 @@ class MainFragment : DaggerFragment() {
         })
     }
 
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            val layoutManager = binding.rvLibraries.layoutManager as LinearLayoutManager
+            if (layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 3) {
+                //Post delayed is used tp avoid 403 API response out
+                // of fast scrolling after the 4th page
+                Handler().postDelayed({
+                    viewModel.getLibrariesList()
+                }, 4000)
+
+            }
+
+            super.onScrolled(recyclerView, dx, dy)
+        }
+    }
+
     private fun setLayout(libraries: List<LibraryEntity>) {
         if (!libraries.isNullOrEmpty()) {
             libs.addAll(libraries)
@@ -71,21 +87,11 @@ class MainFragment : DaggerFragment() {
             //submit the whole list to adapter again?!
             adapter.submitList(libs)
 
-            binding.rvLibraries.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    val layoutManager = binding.rvLibraries.layoutManager as LinearLayoutManager
-                    if (layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 3) {
-                        //Post delayed is used tp avoid 403 API response out
-                        // of fast scrolling after the 4th page
-                        Handler().postDelayed({
-                            viewModel.getLibrariesList()
-                        }, 4000)
-
-                    }
-
-                    super.onScrolled(recyclerView, dx, dy)
-                }
-            })
+            binding.rvLibraries.addOnScrollListener(scrollListener)
+            //Show loading item in the bottom of the list?
+        }else{
+            binding.rvLibraries.removeOnScrollListener(scrollListener)
+            //Add a notification that there's no more data to show
         }
 
     }

@@ -27,19 +27,19 @@ class GetLibrariesRepoImpl
 
     private suspend fun getDataFromRemote(pageNumber: Int): List<LibraryEntity>? {
         val libs = remoteDS.getLibraries(pageNumber).map { it.toEntity() }
-        insert(Page(pageNumber, libs)) // needs to be don in a separate thread and notify the UI faster
+        insertToDB(Page(pageNumber, libs))
         return libs
     }
 
 
-    private suspend fun getDataFromLocal(pageNumber: Int): List<LibraryEntity>? {
-        return pageDao?.getPage(pageNumber)?.librariesPage
+    private suspend fun getDataFromLocal(pageNumber: Int): List<LibraryEntity> {
+        return pageDao.getPage(pageNumber).librariesPage
     }
 
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    private suspend fun insert(page: Page) {
+    private suspend fun insertToDB(page: Page) {
         pageDao.insert(page)
     }
 }
