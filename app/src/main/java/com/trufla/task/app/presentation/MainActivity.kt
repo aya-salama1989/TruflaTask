@@ -1,10 +1,7 @@
 package com.trufla.task.app.presentation
 
-import android.content.Context
-import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
-import android.view.View
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -13,32 +10,38 @@ import com.google.android.material.snackbar.Snackbar
 import com.trufla.task.R
 import com.trufla.task.databinding.ActivityMainBinding
 import dagger.android.support.DaggerAppCompatActivity
+import javax.inject.Inject
 
 
 class MainActivity : DaggerAppCompatActivity() {
 
+    private val appBarConfiguration by lazy {
+        AppBarConfiguration(navController.graph)
+    }
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+
+
+
+    private val navController by lazy {
+        findNavController(R.id.nav_host_fragment_content_main)
+    }
+
+    @Inject
+    lateinit var networkInfo: NetworkInfo
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-
-        //Check internet connectivity
-
-        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
+        val isConnected: Boolean = networkInfo.isConnectedOrConnecting
 
         if (!isConnected) {
             Snackbar.make(binding.root, "You are Offline", Snackbar.LENGTH_INDEFINITE)
@@ -49,7 +52,6 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
